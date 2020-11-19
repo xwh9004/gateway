@@ -6,8 +6,13 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.HttpServerExpectContinueHandler;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class HttpInboundInitializer extends ChannelInitializer<SocketChannel> {
+	@Autowired
+	private HttpInboundHandler  httpInboundHandler;
 
 	@Override
 	public void initChannel(SocketChannel ch) {
@@ -19,6 +24,6 @@ public class HttpInboundInitializer extends ChannelInitializer<SocketChannel> {
 		p.addLast(new HttpServerCodec());
 		p.addLast(new HttpServerExpectContinueHandler());
 		p.addLast(new HttpObjectAggregator(1024 * 1024));
-		p.addLast(new HttpInboundHandler());
+		p.addLast(httpInboundHandler);
 	}
 }

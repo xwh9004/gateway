@@ -1,5 +1,7 @@
 package com.example.gateway.router;
 
+import org.springframework.stereotype.Component;
+
 import java.util.*;
 
 /**
@@ -11,6 +13,7 @@ import java.util.*;
  * @version V0.1
  * @classNmae RandomHttpEndpointRouter
  */
+@Component
 public class RandomHttpEndpointRouter implements HttpEndpointRouter{
 
     public static Map<String,List<String>> routerMap = new HashMap();

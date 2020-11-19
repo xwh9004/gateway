@@ -12,19 +12,21 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-
+@Component
 public class HttpInboundServer {
     private static Logger logger = LoggerFactory.getLogger(HttpInboundServer.class);
-
+    @Value("${gateway.server.port}")
     private int port;
-    
+    @Value("${gateway.server.name}")
     private String proxyServer;
-
-    public HttpInboundServer(int port, String proxyServer) {
-        this.port=port;
-        this.proxyServer = proxyServer;
-    }
+    @Value("${gateway.server.keep-alive}")
+    private boolean keepAlive;
+    @Autowired
+    private HttpInboundInitializer httpInboundInitializer;
 
     public void run() throws Exception {
 
@@ -40,11 +42,11 @@ public class HttpInboundServer {
                     .option(ChannelOption.SO_RCVBUF, 32 * 1024)
                     .option(ChannelOption.SO_SNDBUF, 32 * 1024)
                     .option(EpollChannelOption.SO_REUSEPORT, true)
-                    .childOption(ChannelOption.SO_KEEPALIVE, true)
+                    .childOption(ChannelOption.SO_KEEPALIVE, keepAlive)
                     .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
 
             b.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
-                    .handler(new LoggingHandler(LogLevel.INFO)).childHandler(new HttpInboundInitializer());
+                    .handler(new LoggingHandler(LogLevel.INFO)).childHandler(httpInboundInitializer);
 
             Channel ch = b.bind(port).sync().channel();
             logger.info("开启netty http服务器，监听地址和端口为 http://127.0.0.1:" + port + '/');

@@ -8,6 +8,7 @@ import com.example.gateway.outbound.netty4.NettyClientInvoker;
 import com.example.gateway.outbound.okhttp.OkHttpClientInvoker;
 import com.example.gateway.router.RandomHttpEndpointRouter;
 import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
@@ -16,6 +17,7 @@ import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpUtil;
 import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,9 +26,11 @@ import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 @Slf4j
+@ChannelHandler.Sharable
 public class HttpInboundHandler extends ChannelInboundHandlerAdapter {
 
-    private Invoker invoker = new OkHttpClientInvoker();
+    @Autowired
+    private Invoker invoker ;
 
     private List<HttpRequestFilter> filters = new ArrayList<HttpRequestFilter>();
 
@@ -69,7 +73,6 @@ public class HttpInboundHandler extends ChannelInboundHandlerAdapter {
                 String backendUri =router.route(url);
                 fullRequest.setUri(backendUri);
                 FullHttpResponse response =invoker.invoke(fullRequest, ctx);
-//                handleResponse(fullRequest,ctx,response);
             }
     
         } catch(Exception e) {
