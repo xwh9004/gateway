@@ -33,26 +33,14 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 public class HttpInboundHandler extends ChannelInboundHandlerAdapter {
     @Value("${gateway.server.context-path}")
     private  String contextPath;
-    @Autowired
-    private HttpEndpointRouter router;
 
     @Autowired
     private Invoker invoker ;
-
-    private List<HttpRequestFilter> filters = new ArrayList<HttpRequestFilter>();
-
-    public void setInvoker(Invoker invoker) {
-        this.invoker = invoker;
-    }
-
-    public HttpInboundHandler() {
-        filters.add(new HttpRequestTraceFilter());
-    }
-
-
-    public void addFilter(HttpRequestFilter filter){
-        filters.add(filter);
-    }
+//
+//
+//    public void addFilter(HttpRequestFilter filter){
+//        filters.add(filter);
+//    }
 
 
     @Override
@@ -73,6 +61,10 @@ public class HttpInboundHandler extends ChannelInboundHandlerAdapter {
 
             // http://localhost:8888/api/{serviceName}/xxx
             final FullHttpRequest fullRequest = (FullHttpRequest) msg;
+            String url = fullRequest.uri();
+            if(!url.startsWith(contextPath)){
+                return ;
+            }
             handleRequest(fullRequest,ctx);
         } catch(Exception e) {
             e.printStackTrace();
@@ -90,14 +82,12 @@ public class HttpInboundHandler extends ChannelInboundHandlerAdapter {
     /**
      * handle request
      */
-    private void handleRequest(final FullHttpRequest fullRequest, ChannelHandlerContext ctx) throws Exception {
-        String url = fullRequest.uri();
-        if(!url.startsWith(contextPath)){
-           return ;
-        }
-        filters.stream().forEach(filter -> filter.filter(fullRequest,ctx));
-        String backendUri =router.route(url);
-        fullRequest.setUri(backendUri);
+    public void handleRequest(final FullHttpRequest fullRequest, ChannelHandlerContext ctx) throws Exception {
+
+//        filters.stream().forEach(filter -> filter.filter(fullRequest,ctx));
+//        String url = fullRequest.uri();
+//        String backendUri =router.route(url);
+//        fullRequest.setUri(backendUri);
         FullHttpResponse response =invoker.invoke(fullRequest, ctx);
     }
 

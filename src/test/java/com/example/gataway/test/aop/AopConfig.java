@@ -21,7 +21,7 @@ import org.springframework.util.StopWatch;
 @Component
 public class AopConfig {
 
-    @Around("execution(* com.example.gataway.test.service.TestService.*(..))")
+    @Around("execution(* com.example.gataway.test.service.TestService.test1(..))")
     public Object router(ProceedingJoinPoint joinPoint)throws Throwable {
         StopWatch watch = new StopWatch();
         log.info("开始执行方法{} 参数{} ",joinPoint.getSignature().toShortString(),joinPoint.getArgs());
