@@ -11,10 +11,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  */
 @SpringBootApplication(scanBasePackageClasses = NettyServerApplication.class)
 public class NettyServerApplication {
-    
-    public final static String GATEWAY_NAME = "NIOGateway";
-    public final static String GATEWAY_VERSION = "1.0.0";
-    
+
     public static void main(String[] args) {
 
 

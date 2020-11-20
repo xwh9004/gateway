@@ -1,3 +1,4 @@
+
 #spring:
 #  datasource:
 #      url: jdbc:mysql://118.31.122.126:3306/test2?useSSL=false&useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false&allowMultiQueries=true&serverTimezone=GMT%2B8
@@ -12,6 +13,8 @@
 #        auto-commit: true
 gateway:
   server:
+    name: nio-gataway
+    version: 2.0.0
     port: 8888
-    url: /api
+    context-path: /api/
     keep-alive: true

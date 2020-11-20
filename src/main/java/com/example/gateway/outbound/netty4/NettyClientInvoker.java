@@ -43,12 +43,14 @@ public class NettyClientInvoker implements Invoker {
     @Override
     public FullHttpResponse invoke(FullHttpRequest fullRequest, ChannelHandlerContext ctx) throws Exception {
         ReferenceCountUtil.retain(fullRequest);
-        URI uri = new URI(fullRequest.uri());
-        outboundHandler.setFullRequest(fullRequest);
-        outboundHandler.setServerCtx(ctx);
+
         proxyService.execute(() -> {
             try {
+                URI uri = new URI(fullRequest.uri());
                 ChannelFuture  f =connect(uri.getHost(), uri.getPort());
+                fullRequest.setUri(uri.getPath());
+                outboundHandler.setFullRequest(fullRequest);
+                outboundHandler.setServerCtx(ctx);
                 f.channel().writeAndFlush(fullRequest);
             } catch (Exception e) {
                 e.printStackTrace();

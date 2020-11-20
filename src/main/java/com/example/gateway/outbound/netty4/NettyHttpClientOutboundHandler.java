@@ -69,7 +69,7 @@ public class NettyHttpClientOutboundHandler  extends ChannelInboundHandlerAdapte
             int length =endpointResponse.content().readableBytes();
             byte[] body =new byte[length];
             endpointResponse.content().readBytes(body);
-//            log.info("endpointResponse ={}",new String(body));
+            log.info("endpointResponse ={}",new String(body));
             response = new DefaultFullHttpResponse(HTTP_1_1, OK, Unpooled.wrappedBuffer(body));
             HttpHeaders headerOri = endpointResponse.headers();
             response.headers().add(headerOri);

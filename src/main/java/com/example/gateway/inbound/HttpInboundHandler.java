@@ -6,6 +6,7 @@ import com.example.gateway.outbound.Invoker;
 import com.example.gateway.outbound.httpclient4.HttpClientInvoker;
 import com.example.gateway.outbound.netty4.NettyClientInvoker;
 import com.example.gateway.outbound.okhttp.OkHttpClientInvoker;
+import com.example.gateway.router.HttpEndpointRouter;
 import com.example.gateway.router.RandomHttpEndpointRouter;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
@@ -18,16 +19,22 @@ import io.netty.handler.codec.http.HttpUtil;
 import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
-
 @Slf4j
+@Component
 @ChannelHandler.Sharable
 public class HttpInboundHandler extends ChannelInboundHandlerAdapter {
+    @Value("${gateway.server.context-path}")
+    private  String contextPath;
+    @Autowired
+    private HttpEndpointRouter router;
 
     @Autowired
     private Invoker invoker ;
@@ -63,18 +70,10 @@ public class HttpInboundHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         try {
             long startTime = System.currentTimeMillis();
-            log.info("channelRead流量接口请求开始，时间为{}", startTime);
+
             // http://localhost:8888/api/{serviceName}/xxx
             final FullHttpRequest fullRequest = (FullHttpRequest) msg;
-            String url = fullRequest.uri();
-            if(url.startsWith("/api")){
-                filters.stream().forEach(filter -> filter.filter(fullRequest,ctx));
-                RandomHttpEndpointRouter router = new RandomHttpEndpointRouter();
-                String backendUri =router.route(url);
-                fullRequest.setUri(backendUri);
-                FullHttpResponse response =invoker.invoke(fullRequest, ctx);
-            }
-    
+            handleRequest(fullRequest,ctx);
         } catch(Exception e) {
             e.printStackTrace();
         } finally {
@@ -88,6 +87,19 @@ public class HttpInboundHandler extends ChannelInboundHandlerAdapter {
         ctx.close();
     }
 
+    /**
+     * handle request
+     */
+    private void handleRequest(final FullHttpRequest fullRequest, ChannelHandlerContext ctx) throws Exception {
+        String url = fullRequest.uri();
+        if(!url.startsWith(contextPath)){
+           return ;
+        }
+        filters.stream().forEach(filter -> filter.filter(fullRequest,ctx));
+        String backendUri =router.route(url);
+        fullRequest.setUri(backendUri);
+        FullHttpResponse response =invoker.invoke(fullRequest, ctx);
+    }
 
     private void handleResponse(final FullHttpRequest fullRequest, final ChannelHandlerContext ctx, final FullHttpResponse response) throws Exception {
 

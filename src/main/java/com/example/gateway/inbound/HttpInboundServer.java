@@ -10,23 +10,38 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+@Slf4j
 @Component
-public class HttpInboundServer {
-    private static Logger logger = LoggerFactory.getLogger(HttpInboundServer.class);
+public class HttpInboundServer  {
     @Value("${gateway.server.port}")
     private int port;
     @Value("${gateway.server.name}")
-    private String proxyServer;
+    private String serverName;
     @Value("${gateway.server.keep-alive}")
     private boolean keepAlive;
+    @Value("${gateway.server.version}")
+    private String version;
     @Autowired
     private HttpInboundInitializer httpInboundInitializer;
+
+    @PostConstruct
+    public  void start() {
+        try {
+             run();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public void run() throws Exception {
 
@@ -49,11 +64,12 @@ public class HttpInboundServer {
                     .handler(new LoggingHandler(LogLevel.INFO)).childHandler(httpInboundInitializer);
 
             Channel ch = b.bind(port).sync().channel();
-            logger.info("开启netty http服务器，监听地址和端口为 http://127.0.0.1:" + port + '/');
+            log.info("开启{}服务器，监听地址和端口为 http://127.0.0.1:{}/",serverName,port);
             ch.closeFuture().sync();
         } finally {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
+            log.info("{} server shutdownGracefully!");
         }
     }
 }
