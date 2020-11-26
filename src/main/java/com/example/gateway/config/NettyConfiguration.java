@@ -2,6 +2,8 @@ package com.example.gateway.config;
 
 import com.example.gateway.outbound.Invoker;
 import com.example.gateway.outbound.netty4.NettyClientInvoker;
+import com.example.gateway.outbound.netty4.NettyHttpClientOutboundHandler;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,7 +21,13 @@ import org.springframework.context.annotation.Configuration;
 public class NettyConfiguration {
 
     @Bean
-    public Invoker clientInvoker(){
-        return new NettyClientInvoker();
+    public Invoker clientInvoker(RabbitTemplate rabbitTemplate){
+        NettyHttpClientOutboundHandler outboundHandler = new NettyHttpClientOutboundHandler();
+        outboundHandler.setRabbitTemplate(rabbitTemplate);
+        NettyClientInvoker clientInvoker = new NettyClientInvoker(outboundHandler);
+
+        return clientInvoker;
     }
+
+
 }

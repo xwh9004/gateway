@@ -51,7 +51,7 @@ public class RouterAopConfig {
         try {
             Object[] args = joinPoint.getArgs();
             FullHttpRequest fullRequest = (FullHttpRequest) args[0];
-            ChannelHandlerContext ctx = (ChannelHandlerContext) args[1];
+//            ChannelHandlerContext ctx = (ChannelHandlerContext) args[1];
             String url = fullRequest.uri();
             String backendUri =router.route(url);
             fullRequest.setUri(backendUri);

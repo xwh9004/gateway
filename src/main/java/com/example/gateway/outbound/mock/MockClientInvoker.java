@@ -31,4 +31,9 @@ public class MockClientInvoker implements Invoker {
         response.headers().setInt("Content-Length", response.content().readableBytes());
         return response;
     }
+
+    @Override
+    public FullHttpResponse invoke(FullHttpRequest fullRequest) throws Exception {
+        return null;
+    }
 }

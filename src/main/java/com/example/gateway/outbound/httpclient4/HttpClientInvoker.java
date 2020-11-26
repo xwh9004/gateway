@@ -25,4 +25,9 @@ public class HttpClientInvoker implements Invoker {
         httpOutboundHandler.handle(fullRequest,ctx);
         return null;
     }
+
+    @Override
+    public FullHttpResponse invoke(FullHttpRequest fullRequest) throws Exception {
+        return null;
+    }
 }

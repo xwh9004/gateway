@@ -16,4 +16,6 @@ import io.netty.handler.codec.http.FullHttpResponse;
 public interface Invoker {
 
     FullHttpResponse invoke(final FullHttpRequest fullRequest, final ChannelHandlerContext ctx) throws Exception;
+
+    FullHttpResponse invoke(final FullHttpRequest fullRequest) throws Exception;
 }

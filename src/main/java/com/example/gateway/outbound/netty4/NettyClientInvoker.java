@@ -10,6 +10,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.http.*;
 import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.net.URI;
 import java.util.Map;
@@ -26,11 +27,13 @@ public class NettyClientInvoker implements Invoker {
 
     private NettyHttpClientOutboundHandler outboundHandler;
 
+
+
     private ExecutorService proxyService;
 
-    public NettyClientInvoker() {
+    public NettyClientInvoker(NettyHttpClientOutboundHandler outboundHandler) {
         init();
-        this.outboundHandler = new NettyHttpClientOutboundHandler();
+        this.outboundHandler = outboundHandler;
         int cores = Runtime.getRuntime().availableProcessors() * 2;
         long keepAliveTime = 1000;
         int queueSize = 2048;
@@ -56,6 +59,12 @@ public class NettyClientInvoker implements Invoker {
                 e.printStackTrace();
             }
         });
+        return null;
+    }
+
+    @Override
+    public FullHttpResponse invoke(FullHttpRequest fullRequest) throws Exception {
+        invoke(fullRequest,null);
         return null;
     }
 

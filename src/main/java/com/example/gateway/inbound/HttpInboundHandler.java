@@ -1,51 +1,54 @@
 package com.example.gateway.inbound;
 
+import com.example.gateway.config.RabbitMQConfig;
 import com.example.gateway.filter.HttpRequestFilter;
 import com.example.gateway.filter.HttpRequestTraceFilter;
+import com.example.gateway.jms.MessageProducer;
+import com.example.gateway.jms.RequestMessage;
 import com.example.gateway.outbound.Invoker;
 import com.example.gateway.outbound.httpclient4.HttpClientInvoker;
 import com.example.gateway.outbound.netty4.NettyClientInvoker;
 import com.example.gateway.outbound.okhttp.OkHttpClientInvoker;
 import com.example.gateway.router.HttpEndpointRouter;
 import com.example.gateway.router.RandomHttpEndpointRouter;
+import com.rabbitmq.client.Channel;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
-import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpUtil;
+import io.netty.handler.codec.http.*;
 import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
+import static io.netty.handler.codec.rtsp.RtspResponseStatuses.OK;
+
 @Slf4j
 @Component
 @ChannelHandler.Sharable
 public class HttpInboundHandler extends ChannelInboundHandlerAdapter {
     @Value("${gateway.server.context-path}")
     private  String contextPath;
-
     @Autowired
-    private Invoker invoker ;
-//
-//
-//    public void addFilter(HttpRequestFilter filter){
-//        filters.add(filter);
-//    }
+    private  MessageProducer messageProducer;
 
+    private ChannelHandlerContext ctx;
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
+
         //可以启动一个代理客户端
     }
 
@@ -84,11 +87,9 @@ public class HttpInboundHandler extends ChannelInboundHandlerAdapter {
      */
     public void handleRequest(final FullHttpRequest fullRequest, ChannelHandlerContext ctx) throws Exception {
 
-//        filters.stream().forEach(filter -> filter.filter(fullRequest,ctx));
-//        String url = fullRequest.uri();
-//        String backendUri =router.route(url);
-//        fullRequest.setUri(backendUri);
-        FullHttpResponse response =invoker.invoke(fullRequest, ctx);
+          messageProducer.produce(fullRequest);
+          this.ctx = ctx;
+
     }
 
     private void handleResponse(final FullHttpRequest fullRequest, final ChannelHandlerContext ctx, final FullHttpResponse response) throws Exception {
@@ -114,4 +115,19 @@ public class HttpInboundHandler extends ChannelInboundHandlerAdapter {
 
     }
 
+
+    @RabbitListener(queues = RabbitMQConfig.GATEWAY_RESPONSE)
+    public void consume(byte[] body, Message message, Channel channel) throws IOException {
+
+        FullHttpResponse response = null;
+        response = new DefaultFullHttpResponse(HTTP_1_1, OK, Unpooled.wrappedBuffer(body));
+//        HttpHeaders headerOri = endpointResponse.headers();
+//        response.headers().add(headerOri);
+        response.headers().set("Content-Type", "application/json");
+        response.headers().setInt("Content-Length", body.length);
+
+        channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+        ctx.writeAndFlush(response);
+
+    }
 }

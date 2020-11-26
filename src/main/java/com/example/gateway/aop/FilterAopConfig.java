@@ -71,8 +71,8 @@ public class FilterAopConfig {
         try {
             Object[] args = joinPoint.getArgs();
             FullHttpRequest fullRequest = (FullHttpRequest) args[0];
-            ChannelHandlerContext ctx = (ChannelHandlerContext) args[1];
-            filters.stream().forEach(filter -> filter.filter(fullRequest,ctx));
+//            ChannelHandlerContext ctx = (ChannelHandlerContext) args[1];
+            filters.stream().forEach(filter -> filter.filter(fullRequest,null));
         } catch (Throwable throwable) {
             log.error("执行方法报错 {}",throwable.getMessage());
             throw throwable;

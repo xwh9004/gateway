@@ -16,12 +16,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 @Slf4j
 @Component
-public class HttpInboundServer  {
+public class HttpInboundServer  implements ApplicationListener<ApplicationReadyEvent> {
     @Value("${gateway.server.port}")
     private int port;
     @Value("${gateway.server.name}")
@@ -33,7 +35,7 @@ public class HttpInboundServer  {
     @Autowired
     private HttpInboundInitializer httpInboundInitializer;
 
-    @PostConstruct
+
     public  void start() {
         try {
              run();
@@ -71,5 +73,10 @@ public class HttpInboundServer  {
             workerGroup.shutdownGracefully();
             log.info("{} server shutdownGracefully!");
         }
+    }
+
+    @Override
+    public void onApplicationEvent(ApplicationReadyEvent applicationReadyEvent) {
+        start();
     }
 }
