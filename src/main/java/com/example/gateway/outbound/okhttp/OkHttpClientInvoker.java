@@ -1,7 +1,6 @@
 package com.example.gateway.outbound.okhttp;
 
 import com.example.gateway.outbound.Invoker;
-import com.example.gateway.outbound.httpclient4.HttpOutboundHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;

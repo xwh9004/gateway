@@ -1,4 +1,4 @@
-package com.example.gateway.outbound.httpclient4;
+package com.example.gateway.outbound.httpclient;
 
 import com.example.gateway.outbound.Invoker;
 import io.netty.channel.ChannelHandlerContext;

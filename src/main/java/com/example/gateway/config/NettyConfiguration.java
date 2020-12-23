@@ -1,8 +1,8 @@
 package com.example.gateway.config;
 
 import com.example.gateway.outbound.Invoker;
-import com.example.gateway.outbound.netty4.NettyClientInvoker;
-import com.example.gateway.outbound.netty4.NettyHttpClientOutboundHandler;
+import com.example.gateway.outbound.netty.NettyClientInvoker;
+import com.example.gateway.outbound.netty.NettyHttpClientOutboundHandler;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

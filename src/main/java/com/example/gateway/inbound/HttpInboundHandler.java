@@ -1,16 +1,7 @@
 package com.example.gateway.inbound;
 
 import com.example.gateway.config.RabbitMQConfig;
-import com.example.gateway.filter.HttpRequestFilter;
-import com.example.gateway.filter.HttpRequestTraceFilter;
 import com.example.gateway.jms.MessageProducer;
-import com.example.gateway.jms.RequestMessage;
-import com.example.gateway.outbound.Invoker;
-import com.example.gateway.outbound.httpclient4.HttpClientInvoker;
-import com.example.gateway.outbound.netty4.NettyClientInvoker;
-import com.example.gateway.outbound.okhttp.OkHttpClientInvoker;
-import com.example.gateway.router.HttpEndpointRouter;
-import com.example.gateway.router.RandomHttpEndpointRouter;
 import com.rabbitmq.client.Channel;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
@@ -27,8 +18,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;

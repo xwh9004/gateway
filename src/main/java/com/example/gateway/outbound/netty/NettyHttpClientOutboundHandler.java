@@ -1,4 +1,4 @@
-package com.example.gateway.outbound.netty4;
+package com.example.gateway.outbound.netty;
 
 import com.example.gateway.config.RabbitMQConfig;
 import io.netty.buffer.Unpooled;

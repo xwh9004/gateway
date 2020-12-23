@@ -1,7 +1,7 @@
-package com.example.gateway.outbound.netty4;//package io.github.kimmking.com.example.gateway.outbound;
+package com.example.gateway.outbound.netty;
 
 import com.example.gateway.outbound.Invoker;
-import com.example.gateway.outbound.httpclient4.NamedThreadFactory;
+import com.example.gateway.outbound.httpclient.NamedThreadFactory;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -10,7 +10,6 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.http.*;
 import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.net.URI;
 import java.util.Map;
@@ -107,7 +106,6 @@ public class NettyClientInvoker implements Invoker {
             channelMap.put(remoteHost,channelFuture);
         }
         return channelFuture;
-
     }
 
 }

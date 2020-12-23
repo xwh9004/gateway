@@ -1,4 +1,4 @@
-package com.example.gateway.outbound.httpclient4;
+package com.example.gateway.outbound.httpclient;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;

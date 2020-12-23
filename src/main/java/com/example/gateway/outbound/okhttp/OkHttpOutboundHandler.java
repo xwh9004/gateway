@@ -1,6 +1,6 @@
 package com.example.gateway.outbound.okhttp;
 
-import com.example.gateway.outbound.httpclient4.NamedThreadFactory;
+import com.example.gateway.outbound.httpclient.NamedThreadFactory;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -8,15 +8,8 @@ import io.netty.handler.codec.http.*;
 import kotlin.Pair;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
-import org.apache.http.Header;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.concurrent.FutureCallback;
-import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.apache.http.impl.nio.reactor.IOReactorConfig;
 import org.apache.http.protocol.HTTP;
-import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
