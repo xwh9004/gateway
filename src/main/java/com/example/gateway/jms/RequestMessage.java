@@ -31,5 +31,5 @@ public class RequestMessage implements Serializable {
 
     private String method;
 
-    private Map<String,Object> requsetParams;
+    private byte[] body;
 }

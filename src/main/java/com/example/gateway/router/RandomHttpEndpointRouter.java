@@ -30,7 +30,7 @@ public class RandomHttpEndpointRouter implements HttpEndpointRouter{
 
         List<String> userServices = new ArrayList<>();
 
-        userServices.add("http://localhost:8801");
+        userServices.add("http://localhost:8801/user");
 //        userServices.add("http://localhost:8802/");
 //        userServices.add("http://localhost:8803/");
 
@@ -63,7 +63,10 @@ public class RandomHttpEndpointRouter implements HttpEndpointRouter{
             String serviceUrl = endpoints.substring(contextPath.length());
             if(StringUtils.hasText(serviceUrl)){
                 int index = serviceUrl.indexOf("/");
-                return serviceUrl.substring(0,index);
+                if(index>0){
+                    return serviceUrl.substring(0,index);
+                }
+               return serviceUrl;
             }
         }
         if(endpoints.equals(contextPath)||endpoints.equals(contextPath.substring(0,contextPath.length()-1))){

@@ -4,6 +4,7 @@ import com.example.gateway.config.RabbitMQConfig;
 import com.rabbitmq.client.Channel;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpMethod;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.Message;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.BlockingQueue;
 
 /**
@@ -36,12 +38,19 @@ public class MessageProducer {
 
     public void produce(FullHttpRequest fullRequest){
 
-        String uri =fullRequest.uri();
+        String uriStr =fullRequest.uri();
         String method =fullRequest.method().name();
         RequestMessage requestMessage = new RequestMessage();
-        requestMessage.setUrl(uri);
+        requestMessage.setUrl(uriStr);
+        requestMessage.setHost("localhost");
         requestMessage.setVersion(fullRequest.protocolVersion().text());
         requestMessage.setMethod(method);
+        if(HttpMethod.POST.name().equals(method)){
+            String uripost  = uriStr.substring(0,uriStr.indexOf("?")-1);
+            String body  = uriStr.substring(uriStr.indexOf("?")+1);
+            requestMessage.setUrl(uripost);
+            requestMessage.setBody(body.getBytes(StandardCharsets.UTF_8));
+        }
 
         try {
             rabbitTemplate.convertAndSend(RabbitMQConfig.REQUEST_EXCHANGE_NAME,RabbitMQConfig.GATEWAY_REQUEST, requestMessage, messageProcessor ->{
